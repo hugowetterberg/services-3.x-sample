@@ -1,0 +1,13 @@
+#notetaking {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+  padding: 5px;
+  border: 1px solid #000000;
+  width: 200px;
+  background-color: #FFFFFF;
+}
+
+#notetaking .subject, #notetaking .note {
+  width: 90%;
+}

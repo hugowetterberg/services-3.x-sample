@@ -1,0 +1,68 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_install().
+ */
+function noteresource_install() {
+  drupal_install_schema('noteresource');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function noteresource_uninstall() {
+  drupal_install_schema('noteresource');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function noteresource_schema() {
+  return array(
+    'note' => array(
+      'description' => 'Stores information about notes',
+      'fields' => array(
+        'id' => array(
+          'description' => 'The primary identifier for a note.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'uid' => array(
+          'description' => t('The user that created the note.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'created' => array(
+          'description' => t('The timestamp for when the note was created.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'modified' => array(
+          'description' => t('The timestamp for when the note was modified.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'subject' => array(
+          'description' => t('The subject of the note'),
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+        ),
+        'note' => array(
+          'description' => t('The note'),
+          'type' => 'text',
+          'size' => 'medium',
+        ),
+      ),
+      'primary key' => array('id'),
+    ),
+  );
+}
