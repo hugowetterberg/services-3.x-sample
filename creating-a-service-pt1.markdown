@@ -1,9 +1,12 @@
+Creating a Resource for Services 3.x
+=============================================
+
 I've gotten quite a bit of questions about how the new 3.x version of services works. So I thought that I should write a blog post about developing a service, complete with a endpoint and authentication settings.
 
 We'll implement a simple service for notes and that's exposed using the REST Server. Then we'll implement a simple javascript client for note-taking. This post is pretty much written like extended code comments and [the full code and article text is available here](https://github.com/hugowetterberg/services-3.x-sample). Feel free to fork this repo and flesh out the text if you want to.
 
 Agenda
-======================================
+---------------------------------------------
 
 * Getting the necessary modules
 * Implementing a note service (resource)
@@ -11,7 +14,7 @@ Agenda
 * Writing a simple JavaScript client
 
 Getting the necessary modules
-======================================
+---------------------------------------------
 
 First off we have to download the necessary modules off github and drupal.org. There are two options for the github modules, either you download the zipball or clone the repos.
 
@@ -50,7 +53,7 @@ Autoload is required by the REST Server.
 * Download from [the autoload project page at drupal.org](http://drupal.org/project/autoload).
 
 Implementing a note service (resource)
-========================================
+---------------------------------------------
 
 Create a noteresource module that will contain our service implementation. The info file could look something like this:
 
@@ -466,7 +469,7 @@ Last but not least, we specified a access callback for all methods. This checks 
 As you can see neither the create nor the index function is represented here. That's because they both use user_access() directly. Unlike the other methods there are no considerations like note ownership to take into account. For creation the permission 'note resource create' is checked and for the index listing only 'access content' is needed.
 
 Creating a endpoint
-========================================
+---------------------------------------------
 
 The endpoint can actually be created in two ways either through the admin interface or through code. The easiest option is most often to create the endpoint through the interface, and then export it and copy paste it into your module.
 
@@ -477,7 +480,7 @@ Save and click edit when you see your newly created endpoint in the list. Click 
 You should now have a proper working endpoint that exposes your note API. The easiest way to check that everything's working properly is to add a dummy note to your table. Then try to access it on js-api/note/[id].yaml, where [id] is the id of the note you created (probably 1).
 
 Writing a simple JavaScript client
-========================================
+---------------------------------------------
 
 We'll put our javascript client in a module named noteresourcejs. The info file could look something like this:
 
