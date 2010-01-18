@@ -13,7 +13,7 @@ function noteresourcejs_init() {
  * Implementation of hook_default_services_endpoint().
  */
 function noteresourcejs_default_services_endpoint() {
-  $ndpoints = array();
+  $endpoints = array();
 
   $endpoint = new stdClass;
   $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
