@@ -1,23 +1,23 @@
 // $Id$
 
-(function($){
+(function ($) {
   var noteapi = {
     'apiPath': '/js-api/note'
   };
 
   // REST functions.
-  noteapi.create = function(note, callback) {
+  noteapi.create = function (note, callback) {
     $.ajax({
-       type: "POST",
-       url: this.apiPath,
-       data: JSON.stringify(note),
-       dataType: 'json',
-       contentType: 'application/json',
-       success: callback
-     });
+      type: "POST",
+      url: this.apiPath,
+      data: JSON.stringify(note),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: callback
+    });
   };
 
-  noteapi.retreive = function(id, callback) {
+  noteapi.retreive = function (id, callback) {
     $.ajax({
       type: "GET",
       url: this.apiPath + '/' + id,
@@ -26,24 +26,24 @@
     });
   };
 
-  noteapi.update = function(note, callback) {
+  noteapi.update = function (note, callback) {
     $.ajax({
-       type: "PUT",
-       url: this.apiPath + '/' + note.id,
-       data: JSON.stringify(note),
-       dataType: 'json',
-       contentType: 'application/json',
-       success: callback
-     });
+      type: "PUT",
+      url: this.apiPath + '/' + note.id,
+      data: JSON.stringify(note),
+      dataType: 'json',
+      contentType: 'application/json',
+      success: callback
+    });
   };
 
-  noteapi.del = function(id, callback) {
+  noteapi.del = function (id, callback) {
     $.ajax({
-       type: "DELETE",
-       url: this.apiPath + '/' + id,
-       dataType: 'json',
-       success: callback
-     });
+      type: "DELETE",
+      url: this.apiPath + '/' + id,
+      dataType: 'json',
+      success: callback
+    });
   };
 
   noteapi.index = function (callback) {
@@ -55,8 +55,9 @@
   //   note: 'A test note',
   // }, function(r) {console.log(r)});
 
-  $(document).ready(function() {
+  $(document).ready(function () {
     var subject, text, list, note, note_saved, note_append;
+
     $('<div id="notetaking"><form>' +
         '<div class="subject-wrapper"><label for="note-subject">Subject</label></div>' +
         '<div class="note-wrapper"></div>' + 
@@ -68,16 +69,18 @@
     list = $('<ul></ul>').appendTo('#notetaking');
 
     // Stop the form from submitting
-    $('#notetaking form').submit(function() { return false; });
+    $('#notetaking form').submit(function () {
+      return false;
+    });
 
-    $('#notetaking input.cancel').hide().click(function(){
+    $('#notetaking input.cancel').hide().click(function () {
       note = null;
       $(this).hide();
       $(subject).val('');
       $(text).val('');
     });
 
-    $('#notetaking input.save').click(function(){
+    $('#notetaking input.save').click(function () {
       var data;
       $(this).hide();
       $('#notetaking input.cancel').hide();
@@ -98,19 +101,19 @@
       note = null;
     });
 
-    note_saved = function(res) {
+    note_saved = function (res) {
       note = null;
       $(subject).val('');
       $(text).val('');
       $('#notetaking input.save').show();
 
-      noteapi.retreive(res.id, function(res) {
+      noteapi.retreive(res.id, function (res) {
         note_append(res);
       });
     };
 
-    note_append = function(noteData, bottom) {
-      var noteNode, selector;
+    note_append = function (noteData, bottom) {
+      var noteNode;
 
       $('#note-' + noteData.id).remove();
       noteNode = $('<li class="note">' +
@@ -132,12 +135,12 @@
 
       $('.subject', noteNode).text(noteData.subject);
       $('.text', noteNode).text(noteData.note);
-      $('.delete', noteNode).click(function(){
-        noteapi.del(noteData.id, function(){
+      $('.delete', noteNode).click(function () {
+        noteapi.del(noteData.id, function () {
           $(noteNode).remove();
         });
       });
-      $('.edit', noteNode).click(function(){
+      $('.edit', noteNode).click(function () {
         note = noteData;
         subject.val(noteData.subject);
         text.val(noteData.note);
@@ -145,11 +148,11 @@
       });
     };
 
-    noteapi.index(function(res) {
-      var i;
-      for (i=0; i<res.length; i++) {
+    noteapi.index(function (res) {
+      var i, length;
+      for (i = 0, length = res.length; i < length; i++) {
         note_append(res[i], true);
-      };
+      }
     });
   });
-})(jQuery);
+}(jQuery));
