@@ -68,6 +68,7 @@ Create a noteresource module that will contain our service implementation. The i
 To get a really simple example I'll create an api for storing notes. In a real world scenario notes would probably be stored as nodes, but to keep things simple we'll create our own table for storing notes.
 
     <?php
+    // noteresource.install
     /**
      * Implementation of hook_install().
      */
@@ -139,6 +140,7 @@ To get a really simple example I'll create an api for storing notes. In a real w
 Now lets implement some basic hooks and API methods. We need some permissions that'll be used to decide what our users can and cannot do:
 
     <?php
+    // noteresource.module
     /**
      * Implementation of hook_perm().
      */
@@ -157,6 +159,7 @@ Now lets implement some basic hooks and API methods. We need some permissions th
 Now for some Drupal API methods for the basic CRUD operations for our notes. These will be used by the functions that are used as callbacks for our resource. But it's always a good idea to supply functions like these so that other Drupal modules have a nice and clean interface to your module's data.
 
     <?php
+    // noteresource.module
     /**
      * Gets a note object by id.
      *
@@ -201,6 +204,7 @@ Notice how we define the basic CRUD methods here: create, retrieve, update, dele
 All the methods have `'file' => array('file' => 'inc', 'module' => 'noteresource'),` specified, which tells services that it can find the callback function in the file noteresource.inc, which is where we will write them all.
 
     <?php
+    // noteresource.module
     /**
      * Implementation of hook_services_resources().
      */
@@ -321,6 +325,7 @@ Create the file noteresource.inc which is where we told services that it could f
 We'll start with the create-callback. The method will receive a object describing the note that is about to be saved. The attributes we want are subject and note and we'll throw an error if those are missing. We return the id of the created note, and it's uri so that the client knows how to access it. A get-request to the uri will return the full note.
 
     <?php
+    // noteresource.inc
     /**
      * Callback for creating note resources.
      *
@@ -353,6 +358,7 @@ We'll start with the create-callback. The method will receive a object describin
 The update callback works more or less the same, but we don't have to check that subject and note exists, there is no harm in allowing a client to just update the subject and leave the note alone.
 
     <?php
+    // noteresource.inc
     /**
      * Callback for updating note resources.
      *
@@ -379,6 +385,7 @@ The update callback works more or less the same, but we don't have to check that
 The retrieve and delete callbacks are pretty trivial and probably don't need any further explanation.
 
     <?php
+    // noteresource.inc
     /**
      * Callback for retrieving note resources.
      *
@@ -405,6 +412,7 @@ The retrieve and delete callbacks are pretty trivial and probably don't need any
 The index callback fetches a users notes and returns them all. We specified some arguments for this method that we don't use. They are mostly here to show that it would be a good idea to support paging and filtering of a index listing.
 
     <?php
+    // noteresource.inc
     /**
      * Callback for listing notes.
      *
@@ -431,6 +439,8 @@ The index callback fetches a users notes and returns them all. We specified some
 
 Last but not least, we specified a access callback for all methods. This checks so that users don't oversteps their bounds and starts looking at other people's notes without having the proper permissions. This function should be in the main .module file.
 
+    <?php
+    // noteresource.module
     /**
      * Access callback for the note resource.
      *
@@ -468,7 +478,7 @@ Last but not least, we specified a access callback for all methods. This checks 
 
 As you can see neither the create nor the index function is represented here. That's because they both use user_access() directly. Unlike the other methods there are no considerations like note ownership to take into account. For creation the permission 'note resource create' is checked and for the index listing only 'access content' is needed.
 
-Creating a endpoint
+Creating an endpoint
 ---------------------------------------------
 
 The endpoint can actually be created in two ways either through the admin interface or through code. The easiest option is most often to create the endpoint through the interface, and then export it and copy paste it into your module.
@@ -491,3 +501,122 @@ We'll put our javascript client in a module named noteresourcejs. The info file 
 
     core = 6.x
     php = 5.2
+
+The javascript module will do two things: implement a javascript client; and provide the notes endpoint in code.
+
+### Defining the endpoint in code
+
+Goto admin/build/services and select Export for your Notes API endpoint. The code shown should be copy-pasted in a hook named hook_default_services_endpoint().
+
+  <?php
+  // noteresourcejs.module
+  /**
+   * Implementation of hook_default_services_endpoint().
+   */
+  function noteresourcejs_default_services_endpoint() {
+    $endpoints = array();
+
+    $endpoint = new stdClass;
+    $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
+    $endpoint->endpoint = 'notes';
+    $endpoint->title = 'Note API';
+    $endpoint->server = 'rest_server';
+    $endpoint->path = 'js-api';
+    $endpoint->authentication = '';
+    $endpoint->authentication_settings = array();
+    $endpoint->resources = array(
+      'note' => array(
+        'alias' => '',
+        'operations' => array(
+          'create' => array(
+            'enabled' => 1,
+          ),
+          'retrieve' => array(
+            'enabled' => 1,
+          ),
+          'update' => array(
+            'enabled' => 1,
+          ),
+          'delete' => array(
+            'enabled' => 1,
+          ),
+          'index' => array(
+            'enabled' => 1,
+          ),
+        ),
+      ),
+    );
+    $endpoints[] = $endpoint;
+
+    return $endpoints;
+  }
+
+Notice that we don't return the endpoint as it is. But, as with views, we return an array containing the endpoint.
+
+### The client
+
+Our client is quite trivial and will consist of one js file and one css file. I'm not going to write them both in their entirety here, but rather provide an excerpt that illustrates how you can communicate with a REST server using JavaScript. See [notes.js](services-3.x-sample/blob/master/js/notes.js) and [notes.css](services-3.x-sample/blob/master/css/notes.css) for the full versions.
+
+    // js/notes.js (excerpt)
+    var noteapi = {
+      'apiPath': '/js-api/note'
+    };
+
+    // REST functions.
+    noteapi.create = function(note, callback) {
+      $.ajax({
+         type: "POST",
+         url: this.apiPath,
+         data: JSON.stringify(note),
+         dataType: 'json',
+         contentType: 'application/json',
+         success: callback
+       });
+    };
+
+    noteapi.retreive = function(id, callback) {
+      $.ajax({
+        type: "GET",
+        url: this.apiPath + '/' + id,
+        dataType: 'json',
+        success: callback
+      });
+    };
+
+    noteapi.update = function(note, callback) {
+      $.ajax({
+         type: "PUT",
+         url: this.apiPath + '/' + note.id,
+         data: JSON.stringify(note),
+         dataType: 'json',
+         contentType: 'application/json',
+         success: callback
+       });
+    };
+
+    noteapi.del = function(id, callback) {
+      $.ajax({
+         type: "DELETE",
+         url: this.apiPath + '/' + id,
+         dataType: 'json',
+         success: callback
+       });
+    };
+
+    noteapi.index = function (callback) {
+      $.getJSON(this.apiPath, callback);
+    };
+
+Notice how we don't need to do anything odd to talk with our server. Everything maps to http verbs and a url, so there is no need for special client libraries.
+
+The js and css is added in hook_init(), and will therefore be loaded on all pages in our Drupal install.
+
+    <?php
+    // noteresourcejs.module
+    /**
+     * Implementation of hook_init().
+     */
+    function noteresourcejs_init() {
+      drupal_add_css(drupal_get_path('module', 'noteresourcejs') . '/css/notes.css');
+      drupal_add_js(drupal_get_path('module', 'noteresourcejs') . '/js/notes.js');
+    }
