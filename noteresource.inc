@@ -87,13 +87,12 @@ function _noteresource_index($page, $parameters) {
   global $user;
 
   $notes = array();
-  $res = db_query("SELECT * FROM {note} WHERE uid=%d ORDER BY modified DESC", array(
-    ':uid' => $user->uid,
-  ));
+  $res = db_select('note', 'n')
+    ->fields('n')
+    ->execute();
 
-  while ($note = db_fetch_object($res)) {
+  foreach ($res as $note) {
     $notes[] = $note;
   }
-
   return $notes;
 }

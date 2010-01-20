@@ -2,17 +2,31 @@
 // $Id$
 
 /**
- * Implementation of hook_perm().
+ * Implementation of hook_permissions().
  */
-function noteresource_perm() {
+function noteresource_permissions() {
   return array(
-    'note resource create',
-    'note resource view any note',
-    'note resource view own notes',
-    'note resource edit any note',
-    'note resource edit own notes',
-    'note resource delete any note',
-    'note resource delete own notes',
+    'note resource create' => array(
+      'title' => t('Create notes'),
+    ),
+    'note resource view any note' => array(
+      'title' => t('View notes from all users'),
+    ),
+    'note resource view own notes' => array(
+      'title' => t('View own notes'),
+    ),
+    'note resource edit any note' => array(
+      'title' => t('Edit all users notes'),
+    ),
+    'note resource edit own notes' => array(
+      'title' => t('Edit own notes'),
+    ),
+    'note resource delete any note' => array(
+      'title' => t('Delete notes from all users'),
+    ),
+    'note resource delete own notes' => array(
+      'title' => t('Delete own notes'),
+    ),
   );
 }
 
@@ -23,9 +37,11 @@ function noteresource_perm() {
  * @return object
  */
 function noteresource_get_note($id) {
-  return db_fetch_object(db_query("SELECT * FROM {note} WHERE id=%d", array(
-    ':id' => $id,
-  )));
+  return (object)db_select('note', 'n')
+    ->fields('n')
+    ->condition('id', $id)
+    ->execute()
+    ->fetchAssoc();
 }
 
 /**
@@ -46,9 +62,9 @@ function noteresource_write_note($note) {
  * @return void
  */
 function noteresource_delete_note($id) {
-  db_query("DELETE FROM {note} WHERE id=%d", array(
-    ':id' => $id,
-  ));
+  db_delete('note')
+    ->condition('id', $id)
+    ->execute();
 }
 
 /**

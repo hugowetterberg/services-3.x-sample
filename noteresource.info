@@ -3,5 +3,7 @@ name = Note Resource
 description = Sample resource implementation
 package = Notes example
 
-core = 6.x
-php = 5.2
+core = 7.x
+
+files[] = noteresource.inc
+files[] = noteresource.module
