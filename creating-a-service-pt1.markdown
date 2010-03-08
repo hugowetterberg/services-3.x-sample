@@ -20,8 +20,8 @@ First off we have to download the necessary modules off github and drupal.org. T
 
 ### Services
 
-* `git clone --branch endpoints git://github.com/hugowetterberg/services.git`
-* or [download zipball](http://github.com/hugowetterberg/services/zipball/endpoints)
+* `git clone --branch 6.x-3.x git://github.com/hugowetterberg/services.git`
+* or [download zipball](http://github.com/hugowetterberg/services/zipball/6.x-3.x)
 
 ### Chaos tools
 
