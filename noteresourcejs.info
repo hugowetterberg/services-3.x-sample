@@ -3,5 +3,8 @@ name = Notes Javascript
 description = Sample endpoint definition and javascript client implementation
 package = Notes example
 
+dependencies[] = noteresource
+dependencies[] = rest_server
+
 core = 6.x
 php = 5.2

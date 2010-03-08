@@ -3,5 +3,7 @@ name = Note Resource
 description = Sample resource implementation
 package = Notes example
 
+dependencies[] = services
+
 core = 6.x
 php = 5.2
