@@ -2,7 +2,10 @@
 name = Notes Javascript
 description = Sample endpoint definition and javascript client implementation
 package = Notes example
-
 core = 7.x
 
 files[] = noteresourcejs.module
+
+dependencies[] = noteresource
+dependencies[] = rest_server
+

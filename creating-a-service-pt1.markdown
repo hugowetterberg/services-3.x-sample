@@ -20,8 +20,8 @@ First off we have to download the necessary modules off github and drupal.org. T
 
 ### Services
 
-* `git clone --branch endpoints git://github.com/hugowetterberg/services.git`
-* or [download zipball](http://github.com/hugowetterberg/services/zipball/endpoints)
+* `git clone --branch 6.x-3.x git://github.com/hugowetterberg/services.git`
+* or [download zipball](http://github.com/hugowetterberg/services/zipball/6.x-3.x)
 
 ### Chaos tools
 
@@ -33,8 +33,8 @@ The only dependency for services. Provides the framework for the endpoint defini
 
 My server implementation of choice and what we'll be using to test our service. The reason for the branch being named contexts was that that was my initial working title for services 3.x. I later realized that the use of such a established term would be confusing and switched to endpoints, I never bothered to rename this branch though.
 
-* git clone --branch contexts git://github.com/hugowetterberg/rest_server.git
-* or [download zipball](http://github.com/hugowetterberg/rest_server/zipball/contexts)
+* git clone --branch 6.x-3.x git://github.com/hugowetterberg/rest_server.git
+* or [download zipball](http://github.com/hugowetterberg/rest_server/zipball/6.x-3.x)
 
 ### Inputstream
 
@@ -508,48 +508,48 @@ The javascript module will do two things: implement a javascript client; and pro
 
 Goto admin/build/services and select Export for your Notes API endpoint. The code shown should be copy-pasted in a hook named hook_default_services_endpoint().
 
-  <?php
-  // noteresourcejs.module
-  /**
-   * Implementation of hook_default_services_endpoint().
-   */
-  function noteresourcejs_default_services_endpoint() {
-    $endpoints = array();
+    <?php
+    // noteresourcejs.module
+    /**
+     * Implementation of hook_default_services_endpoint().
+     */
+    function noteresourcejs_default_services_endpoint() {
+      $endpoints = array();
 
-    $endpoint = new stdClass;
-    $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
-    $endpoint->endpoint = 'notes';
-    $endpoint->title = 'Note API';
-    $endpoint->server = 'rest_server';
-    $endpoint->path = 'js-api';
-    $endpoint->authentication = '';
-    $endpoint->authentication_settings = array();
-    $endpoint->resources = array(
-      'note' => array(
-        'alias' => '',
-        'operations' => array(
-          'create' => array(
-            'enabled' => 1,
-          ),
-          'retrieve' => array(
-            'enabled' => 1,
-          ),
-          'update' => array(
-            'enabled' => 1,
-          ),
-          'delete' => array(
-            'enabled' => 1,
-          ),
-          'index' => array(
-            'enabled' => 1,
+      $endpoint = new stdClass;
+      $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
+      $endpoint->endpoint = 'notes';
+      $endpoint->title = 'Note API';
+      $endpoint->server = 'rest_server';
+      $endpoint->path = 'js-api';
+      $endpoint->authentication = '';
+      $endpoint->authentication_settings = array();
+      $endpoint->resources = array(
+        'note' => array(
+          'alias' => '',
+          'operations' => array(
+            'create' => array(
+              'enabled' => 1,
+            ),
+            'retrieve' => array(
+              'enabled' => 1,
+            ),
+            'update' => array(
+              'enabled' => 1,
+            ),
+            'delete' => array(
+              'enabled' => 1,
+            ),
+            'index' => array(
+              'enabled' => 1,
+            ),
           ),
         ),
-      ),
-    );
-    $endpoints[] = $endpoint;
+      );
+      $endpoints[] = $endpoint;
 
-    return $endpoints;
-  }
+      return $endpoints;
+    }
 
 Notice that we don't return the endpoint as it is. But, as with views, we return an array containing the endpoint.
 

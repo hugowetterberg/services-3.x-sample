@@ -2,8 +2,9 @@
 name = Note Resource
 description = Sample resource implementation
 package = Notes example
-
 core = 7.x
 
 files[] = noteresource.inc
 files[] = noteresource.module
+
+dependencies[] = services

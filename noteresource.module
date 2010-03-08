@@ -94,6 +94,7 @@ function noteresource_services_resources() {
        'help' => 'Creates a note',
        'file' => array('file' => 'inc', 'module' => 'noteresource'),
        'callback' => '_noteresource_create',
+       'access callback' => 'user_access',
        'access arguments' => array('note resource create'),
        'access arguments append' => FALSE,
        'args' => array(
