@@ -33,8 +33,8 @@ The only dependency for services. Provides the framework for the endpoint defini
 
 My server implementation of choice and what we'll be using to test our service. The reason for the branch being named contexts was that that was my initial working title for services 3.x. I later realized that the use of such a established term would be confusing and switched to endpoints, I never bothered to rename this branch though.
 
-* git clone --branch contexts git://github.com/hugowetterberg/rest_server.git
-* or [download zipball](http://github.com/hugowetterberg/rest_server/zipball/contexts)
+* git clone --branch 6.x-3.x git://github.com/hugowetterberg/rest_server.git
+* or [download zipball](http://github.com/hugowetterberg/rest_server/zipball/6.x-3.x)
 
 ### Inputstream
 
