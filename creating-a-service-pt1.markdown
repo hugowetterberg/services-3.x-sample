@@ -508,48 +508,48 @@ The javascript module will do two things: implement a javascript client; and pro
 
 Goto admin/build/services and select Export for your Notes API endpoint. The code shown should be copy-pasted in a hook named hook_default_services_endpoint().
 
-  <?php
-  // noteresourcejs.module
-  /**
-   * Implementation of hook_default_services_endpoint().
-   */
-  function noteresourcejs_default_services_endpoint() {
-    $endpoints = array();
+    <?php
+    // noteresourcejs.module
+    /**
+     * Implementation of hook_default_services_endpoint().
+     */
+    function noteresourcejs_default_services_endpoint() {
+      $endpoints = array();
 
-    $endpoint = new stdClass;
-    $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
-    $endpoint->endpoint = 'notes';
-    $endpoint->title = 'Note API';
-    $endpoint->server = 'rest_server';
-    $endpoint->path = 'js-api';
-    $endpoint->authentication = '';
-    $endpoint->authentication_settings = array();
-    $endpoint->resources = array(
-      'note' => array(
-        'alias' => '',
-        'operations' => array(
-          'create' => array(
-            'enabled' => 1,
-          ),
-          'retrieve' => array(
-            'enabled' => 1,
-          ),
-          'update' => array(
-            'enabled' => 1,
-          ),
-          'delete' => array(
-            'enabled' => 1,
-          ),
-          'index' => array(
-            'enabled' => 1,
+      $endpoint = new stdClass;
+      $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
+      $endpoint->endpoint = 'notes';
+      $endpoint->title = 'Note API';
+      $endpoint->server = 'rest_server';
+      $endpoint->path = 'js-api';
+      $endpoint->authentication = '';
+      $endpoint->authentication_settings = array();
+      $endpoint->resources = array(
+        'note' => array(
+          'alias' => '',
+          'operations' => array(
+            'create' => array(
+              'enabled' => 1,
+            ),
+            'retrieve' => array(
+              'enabled' => 1,
+            ),
+            'update' => array(
+              'enabled' => 1,
+            ),
+            'delete' => array(
+              'enabled' => 1,
+            ),
+            'index' => array(
+              'enabled' => 1,
+            ),
           ),
         ),
-      ),
-    );
-    $endpoints[] = $endpoint;
+      );
+      $endpoints[] = $endpoint;
 
-    return $endpoints;
-  }
+      return $endpoints;
+    }
 
 Notice that we don't return the endpoint as it is. But, as with views, we return an array containing the endpoint.
 
