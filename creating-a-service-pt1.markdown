@@ -20,8 +20,8 @@ First off we have to download the necessary modules off github and drupal.org. T
 
 ### Services
 
-* `git clone --branch 6.x-3.x git://github.com/hugowetterberg/services.git`
-* or [download zipball](http://github.com/hugowetterberg/services/zipball/6.x-3.x)
+* `git clone --branch 7.x-3.x git://github.com/hugowetterberg/services.git`
+* or [download zipball](http://github.com/hugowetterberg/services/zipball/7.x-3.x)
 
 ### Chaos tools
 
@@ -33,8 +33,8 @@ The only dependency for services. Provides the framework for the endpoint defini
 
 My server implementation of choice and what we'll be using to test our service. The reason for the branch being named contexts was that that was my initial working title for services 3.x. I later realized that the use of such a established term would be confusing and switched to endpoints, I never bothered to rename this branch though.
 
-* git clone --branch 6.x-3.x git://github.com/hugowetterberg/rest_server.git
-* or [download zipball](http://github.com/hugowetterberg/rest_server/zipball/6.x-3.x)
+* git clone --branch 7.x-3.x git://github.com/hugowetterberg/rest_server.git
+* or [download zipball](http://github.com/hugowetterberg/rest_server/zipball/7.x-3.x)
 
 ### Inputstream
 
