@@ -17,12 +17,11 @@ function noteresourcejs_default_services_endpoint() {
 
   $endpoint = new stdClass;
   $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
-  $endpoint->endpoint = 'notes';
+  $endpoint->name = 'notes_js';
   $endpoint->title = 'Note API';
   $endpoint->server = 'rest_server';
   $endpoint->path = 'js-api';
-  $endpoint->authentication = '';
-  $endpoint->authentication_settings = array();
+  $endpoint->authentication = array();
   $endpoint->resources = array(
     'note' => array(
       'alias' => '',

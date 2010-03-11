@@ -484,9 +484,9 @@ Creating an endpoint
 
 The endpoint can actually be created in two ways either through the admin interface or through code. The easiest option is most often to create the endpoint through the interface, and then export it and copy paste it into your module.
 
-Go to admin/build/services and click "Add endpoint". Name your endpoint "notes" and call it something nice, like "Note API". Choose "REST" as your server and place the endpoint at "js-api". No authentication modules are installed so just let authentication remain set to "Session".
+Go to admin/build/services and click "Add endpoint". Name your endpoint "notes" and call it something nice, like "Note API". Choose "REST" as your server and place the endpoint at "js-api".
 
-Save and click edit when you see your newly created endpoint in the list. Click the Resources tab/local task and enable all methods for the note resource. Then save your changes.
+Save and click the Resources tab/local task and enable all methods for the note resource. Then save your changes.
 
 You should now have a proper working endpoint that exposes your note API. The easiest way to check that everything's working properly is to add a dummy note to your table. Then try to access it on js-api/note/[id].yaml, where [id] is the id of the note you created (probably 1).
 
@@ -519,12 +519,11 @@ Goto admin/build/services and select Export for your Notes API endpoint. The cod
 
       $endpoint = new stdClass;
       $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
-      $endpoint->endpoint = 'notes';
+      $endpoint->name = 'notes_js';
       $endpoint->title = 'Note API';
       $endpoint->server = 'rest_server';
       $endpoint->path = 'js-api';
-      $endpoint->authentication = '';
-      $endpoint->authentication_settings = array();
+      $endpoint->authentication = array();
       $endpoint->resources = array(
         'note' => array(
           'alias' => '',
