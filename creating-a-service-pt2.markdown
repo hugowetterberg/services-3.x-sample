@@ -51,3 +51,14 @@ We're going to leave these fields as they are. But you can always go back and cu
 
 ### Authorization levels ###
 
+Use the "Add authorization levels" button and add the following authorization levels:
+
+    Name: read
+    Title: Allow @appname to read my notes
+    Description: This will allow @appname to access the notes that you've created here at @sitename.
+
+    Name: write
+    Title: Allow @appname to edit my notes
+    Description: This will allow @appname to edit your existing notes and create new ones.
+
+What exact names you use here is not important, the important thing is that the title and description conveys their meaning to the user that will grant the authorization levels. And the name should make sense to people reading your context definitions.
