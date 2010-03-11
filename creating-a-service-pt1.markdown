@@ -22,6 +22,7 @@ First off we have to download the necessary modules off github and drupal.org. T
 
 * `git clone --branch 6.x-3.x git://github.com/hugowetterberg/services.git`
 * or [download zipball](http://github.com/hugowetterberg/services/zipball/6.x-3.x)
+* or download the 6.x-3.x version from [the services project page at drupal.org](http://drupal.org/project/services).
 
 ### Chaos tools
 
