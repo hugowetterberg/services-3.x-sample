@@ -58,143 +58,151 @@ Implementing a note service (resource)
 
 Create a noteresource module that will contain our service implementation. The info file could look something like this:
 
-    ; $Id$
-    name = Note Resource
-    description = Sample resource implementation
-    package = Notes example
+~~~
+; $Id$
+name = Note Resource
+description = Sample resource implementation
+package = Notes example
 
-    core = 6.x
-    php = 5.2
+core = 6.x
+php = 5.2
+~~~
 
 To get a really simple example I'll create an api for storing notes. In a real world scenario notes would probably be stored as nodes, but to keep things simple we'll create our own table for storing notes.
 
-    <?php
-    // noteresource.install
-    /**
-     * Implementation of hook_install().
-     */
-    function noteresource_install() {
-      drupal_install_schema('noteresource');
-    }
+~~~ php
+<?php
+// noteresource.install
+/**
+ * Implementation of hook_install().
+ */
+function noteresource_install() {
+  drupal_install_schema('noteresource');
+}
 
-    /**
-     * Implementation of hook_uninstall().
-     */
-    function noteresource_uninstall() {
-      drupal_install_schema('noteresource');
-    }
+/**
+ * Implementation of hook_uninstall().
+ */
+function noteresource_uninstall() {
+  drupal_install_schema('noteresource');
+}
 
-    /**
-     * Implementation of hook_schema().
-     */
-    function noteresource_schema() {
-      return array(
-        'note' => array(
-          'description' => 'Stores information about notes',
-          'fields' => array(
-            'id' => array(
-              'description' => 'The primary identifier for a note.',
-              'type' => 'serial',
-              'unsigned' => TRUE,
-              'not null' => TRUE,
-            ),
-            'uid' => array(
-              'description' => t('The user that created the note.'),
-              'type' => 'int',
-              'unsigned' => TRUE,
-              'not null' => TRUE,
-              'default' => 0,
-            ),
-            'created' => array(
-              'description' => t('The timestamp for when the note was created.'),
-              'type' => 'int',
-              'unsigned' => TRUE,
-              'not null' => TRUE,
-              'default' => 0,
-            ),
-            'modified' => array(
-              'description' => t('The timestamp for when the note was modified.'),
-              'type' => 'int',
-              'unsigned' => TRUE,
-              'not null' => TRUE,
-              'default' => 0,
-            ),
-            'subject' => array(
-              'description' => t('The subject of the note'),
-              'type' => 'varchar',
-              'length' => 255,
-              'not null' => TRUE,
-            ),
-            'note' => array(
-              'description' => t('The note'),
-              'type' => 'text',
-              'size' => 'medium',
-            ),
-          ),
-          'primary key' => array('id'),
+/**
+ * Implementation of hook_schema().
+ */
+function noteresource_schema() {
+  return array(
+    'note' => array(
+      'description' => 'Stores information about notes',
+      'fields' => array(
+        'id' => array(
+          'description' => 'The primary identifier for a note.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
         ),
-      );
-    }
+        'uid' => array(
+          'description' => t('The user that created the note.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'created' => array(
+          'description' => t('The timestamp for when the note was created.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'modified' => array(
+          'description' => t('The timestamp for when the note was modified.'),
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'subject' => array(
+          'description' => t('The subject of the note'),
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+        ),
+        'note' => array(
+          'description' => t('The note'),
+          'type' => 'text',
+          'size' => 'medium',
+        ),
+      ),
+      'primary key' => array('id'),
+    ),
+  );
+}
+~~~
 
 ### The familiar stuff
 
 Now lets implement some basic hooks and API methods. We need some permissions that'll be used to decide what our users can and cannot do:
 
-    <?php
-    // noteresource.module
-    /**
-     * Implementation of hook_perm().
-     */
-    function noteresource_perm() {
-      return array(
-        'note resource create',
-        'note resource view any note',
-        'note resource view own notes',
-        'note resource edit any note',
-        'note resource edit own notes',
-        'note resource delete any note',
-        'note resource delete own notes',
-      );
-    }
+~~~ php
+<?php
+// noteresource.module
+/**
+ * Implementation of hook_perm().
+ */
+function noteresource_perm() {
+  return array(
+    'note resource create',
+    'note resource view any note',
+    'note resource view own notes',
+    'note resource edit any note',
+    'note resource edit own notes',
+    'note resource delete any note',
+    'note resource delete own notes',
+  );
+}
+~~~
 
 Now for some Drupal API methods for the basic CRUD operations for our notes. These will be used by the functions that are used as callbacks for our resource. But it's always a good idea to supply functions like these so that other Drupal modules have a nice and clean interface to your module's data.
 
-    <?php
-    // noteresource.module
-    /**
-     * Gets a note object by id.
-     *
-     * @param int $id
-     * @return object
-     */
-    function noteresource_get_note($id) {
-      return db_fetch_object(db_query("SELECT * FROM {note} WHERE id=%d", array(
-        ':id' => $id,
-      )));
-    }
+~~~ php
+<?php
+// noteresource.module
+/**
+ * Gets a note object by id.
+ *
+ * @param int $id
+ * @return object
+ */
+function noteresource_get_note($id) {
+  return db_fetch_object(db_query("SELECT * FROM {note} WHERE id=%d", array(
+    ':id' => $id,
+  )));
+}
 
-    /**
-     * Writes a note to the database
-     *
-     * @param object $note
-     * @return void
-     */
-    function noteresource_write_note($note) {
-      $primary_key = !empty($note->id) ? array('id') : NULL;
-      drupal_write_record('note', $note, $primary_key);
-    }
+/**
+ * Writes a note to the database
+ *
+ * @param object $note
+ * @return void
+ */
+function noteresource_write_note($note) {
+  $primary_key = !empty($note->id) ? array('id') : NULL;
+  drupal_write_record('note', $note, $primary_key);
+}
 
-    /**
-     * Deletes a note from the database.
-     *
-     * @param int $id
-     * @return void
-     */
-    function noteresource_delete_note($id) {
-      db_query("DELETE FROM {note} WHERE id=%d", array(
-        ':id' => $id,
-      ));
-    }
+/**
+ * Deletes a note from the database.
+ *
+ * @param int $id
+ * @return void
+ */
+function noteresource_delete_note($id) {
+  db_query("DELETE FROM {note} WHERE id=%d", array(
+    ':id' => $id,
+  ));
+}
+~~~
 
 ### Defining our resource
 
@@ -204,118 +212,120 @@ Notice how we define the basic CRUD methods here: create, retrieve, update, dele
 
 All the methods have `'file' => array('file' => 'inc', 'module' => 'noteresource'),` specified, which tells services that it can find the callback function in the file noteresource.inc, which is where we will write them all.
 
-    <?php
-    // noteresource.module
-    /**
-     * Implementation of hook_services_resources().
-     */
-    function noteresource_services_resources() {
-      return array(
-       'note' => array(
-         'retrieve' => array(
-           'help' => 'Retrieves a note',
-           'file' => array('file' => 'inc', 'module' => 'noteresource'),
-           'callback' => '_noteresource_retrieve',
-           'access callback' => '_noteresource_access',
-           'access arguments' => array('view'),
-           'access arguments append' => TRUE,
-           'args' => array(
-             array(
-               'name' => 'id',
-               'type' => 'int',
-               'description' => 'The id of the note to get',
-               'source' => array('path' => '0'),
-               'optional' => FALSE,
-             ),
-           ),
-         ),
-         'create' => array(
-           'help' => 'Creates a note',
-           'file' => array('file' => 'inc', 'module' => 'noteresource'),
-           'callback' => '_noteresource_create',
-           'access arguments' => array('note resource create'),
-           'access arguments append' => FALSE,
-           'args' => array(
-             array(
-               'name' => 'data',
-               'type' => 'struct',
-               'description' => 'The note object',
-               'source' => 'data',
-               'optional' => FALSE,
-             ),
-           ),
-         ),
-         'update' => array(
-           'help' => 'Updates a note',
-           'file' => array('file' => 'inc', 'module' => 'noteresource'),
-           'callback' => '_noteresource_update',
-           'access callback' => '_noteresource_access',
-           'access arguments' => array('update'),
-           'access arguments append' => TRUE,
-           'args' => array(
-             array(
-               'name' => 'id',
-               'type' => 'int',
-               'description' => 'The id of the node to update',
-               'source' => array('path' => '0'),
-               'optional' => FALSE,
-             ),
-             array(
-               'name' => 'data',
-               'type' => 'struct',
-               'description' => 'The note data object',
-               'source' => 'data',
-               'optional' => FALSE,
-             ),
-           ),
-         ),
-         'delete' => array(
-           'help' => 'Deletes a note',
-           'file' => array('file' => 'inc', 'module' => 'noteresource'),
-           'callback' => '_noteresource_delete',
-           'access callback' => '_noteresource_access',
-           'access arguments' => array('delete'),
-           'access arguments append' => TRUE,
-           'args' => array(
-             array(
-               'name' => 'nid',
-               'type' => 'int',
-               'description' => 'The id of the note to delete',
-               'source' => array('path' => '0'),
-               'optional' => FALSE,
-             ),
-           ),
-         ),
-         'index' => array(
-           'help' => 'Retrieves a listing of notes',
-           'file' => array('file' => 'inc', 'module' => 'noteresource'),
-           'callback' => '_noteresource_index',
-           'access callback' => 'user_access',
-           'access arguments' => array('access content'),
-           'access arguments append' => FALSE,
-           'args' => array(array(
-               'name' => 'page',
-               'type' => 'int',
-               'description' => '',
-               'source' => array(
-                 'param' => 'page',
-               ),
-               'optional' => TRUE,
-               'default value' => 0,
-             ),
-             array(
-               'name' => 'parameters',
-               'type' => 'array',
-               'description' => '',
-               'source' => 'param',
-               'optional' => TRUE,
-               'default value' => array(),
-             ),
-           ),
+~~~ php
+<?php
+// noteresource.module
+/**
+ * Implementation of hook_services_resources().
+ */
+function noteresource_services_resources() {
+  return array(
+   'note' => array(
+     'retrieve' => array(
+       'help' => 'Retrieves a note',
+       'file' => array('file' => 'inc', 'module' => 'noteresource'),
+       'callback' => '_noteresource_retrieve',
+       'access callback' => '_noteresource_access',
+       'access arguments' => array('view'),
+       'access arguments append' => TRUE,
+       'args' => array(
+         array(
+           'name' => 'id',
+           'type' => 'int',
+           'description' => 'The id of the note to get',
+           'source' => array('path' => '0'),
+           'optional' => FALSE,
          ),
        ),
-      );
-    }
+     ),
+     'create' => array(
+       'help' => 'Creates a note',
+       'file' => array('file' => 'inc', 'module' => 'noteresource'),
+       'callback' => '_noteresource_create',
+       'access arguments' => array('note resource create'),
+       'access arguments append' => FALSE,
+       'args' => array(
+         array(
+           'name' => 'data',
+           'type' => 'struct',
+           'description' => 'The note object',
+           'source' => 'data',
+           'optional' => FALSE,
+         ),
+       ),
+     ),
+     'update' => array(
+       'help' => 'Updates a note',
+       'file' => array('file' => 'inc', 'module' => 'noteresource'),
+       'callback' => '_noteresource_update',
+       'access callback' => '_noteresource_access',
+       'access arguments' => array('update'),
+       'access arguments append' => TRUE,
+       'args' => array(
+         array(
+           'name' => 'id',
+           'type' => 'int',
+           'description' => 'The id of the node to update',
+           'source' => array('path' => '0'),
+           'optional' => FALSE,
+         ),
+         array(
+           'name' => 'data',
+           'type' => 'struct',
+           'description' => 'The note data object',
+           'source' => 'data',
+           'optional' => FALSE,
+         ),
+       ),
+     ),
+     'delete' => array(
+       'help' => 'Deletes a note',
+       'file' => array('file' => 'inc', 'module' => 'noteresource'),
+       'callback' => '_noteresource_delete',
+       'access callback' => '_noteresource_access',
+       'access arguments' => array('delete'),
+       'access arguments append' => TRUE,
+       'args' => array(
+         array(
+           'name' => 'nid',
+           'type' => 'int',
+           'description' => 'The id of the note to delete',
+           'source' => array('path' => '0'),
+           'optional' => FALSE,
+         ),
+       ),
+     ),
+     'index' => array(
+       'help' => 'Retrieves a listing of notes',
+       'file' => array('file' => 'inc', 'module' => 'noteresource'),
+       'callback' => '_noteresource_index',
+       'access callback' => 'user_access',
+       'access arguments' => array('access content'),
+       'access arguments append' => FALSE,
+       'args' => array(array(
+           'name' => 'page',
+           'type' => 'int',
+           'description' => '',
+           'source' => array(
+             'param' => 'page',
+           ),
+           'optional' => TRUE,
+           'default value' => 0,
+         ),
+         array(
+           'name' => 'parameters',
+           'type' => 'array',
+           'description' => '',
+           'source' => 'param',
+           'optional' => TRUE,
+           'default value' => array(),
+         ),
+       ),
+     ),
+   ),
+  );
+}
+~~~
 
 There is another alternative when defining services (which I personally prefer) but that will probably be covered in a later article. Take a look at http://github.com/hugowetterberg/services_oop if you're curious.
 
@@ -325,157 +335,167 @@ Create the file noteresource.inc which is where we told services that it could f
 
 We'll start with the create-callback. The method will receive a object describing the note that is about to be saved. The attributes we want are subject and note and we'll throw an error if those are missing. We return the id of the created note, and it's uri so that the client knows how to access it. A get-request to the uri will return the full note.
 
-    <?php
-    // noteresource.inc
-    /**
-     * Callback for creating note resources.
-     *
-     * @param object $data
-     * @return object
-     */
-    function _noteresource_create($data) {
-      global $user;
+~~~ php
+<?php
+// noteresource.inc
+/**
+ * Callback for creating note resources.
+ *
+ * @param object $data
+ * @return object
+ */
+function _noteresource_create($data) {
+  global $user;
 
-      unset($data->id);
-      $data->uid = $user->uid;
-      $data->created = time();
-      $data->modified = time();
+  unset($data->id);
+  $data->uid = $user->uid;
+  $data->created = time();
+  $data->modified = time();
 
-      if (!isset($data->subject)) {
-        return services_error('Missing note attribute subject', 406);
-      }
+  if (!isset($data->subject)) {
+    return services_error('Missing note attribute subject', 406);
+  }
 
-      if (!isset($data->note)) {
-        return services_error('Missing note attribute note', 406);
-      }
+  if (!isset($data->note)) {
+    return services_error('Missing note attribute note', 406);
+  }
 
-      noteresource_write_note($data);
-      return (object)array(
-        'id' => $data->id,
-        'uri' => services_resource_uri(array('note', $data->id)),
-      );
-    }
+  noteresource_write_note($data);
+  return (object)array(
+    'id' => $data->id,
+    'uri' => services_resource_uri(array('note', $data->id)),
+  );
+}
+~~~
 
 The update callback works more or less the same, but we don't have to check that subject and note exists, there is no harm in allowing a client to just update the subject and leave the note alone.
 
-    <?php
-    // noteresource.inc
-    /**
-     * Callback for updating note resources.
-     *
-     * @param int $id
-     * @param object $data
-     * @return object
-     */
-    function _noteresource_update($id, $data) {
-      global $user;
-      $note = noteresource_get_note($id);
+~~~ php
+<?php
+// noteresource.inc
+/**
+ * Callback for updating note resources.
+ *
+ * @param int $id
+ * @param object $data
+ * @return object
+ */
+function _noteresource_update($id, $data) {
+  global $user;
+  $note = noteresource_get_note($id);
 
-      unset($data->created);
-      $data->id = $id;
-      $data->uid = $note->uid;
-      $data->modified = time();
+  unset($data->created);
+  $data->id = $id;
+  $data->uid = $note->uid;
+  $data->modified = time();
 
-      noteresource_write_note($data);
-      return (object)array(
-        'id' => $id,
-        'uri' => services_resource_uri(array('note', $id)),
-      );
-    }
+  noteresource_write_note($data);
+  return (object)array(
+    'id' => $id,
+    'uri' => services_resource_uri(array('note', $id)),
+  );
+}
+~~~
 
 The retrieve and delete callbacks are pretty trivial and probably don't need any further explanation.
 
-    <?php
-    // noteresource.inc
-    /**
-     * Callback for retrieving note resources.
-     *
-     * @param int $id
-     * @return object
-     */
-    function _noteresource_retrieve($id) {
-      return noteresource_get_note($id);
-    }
+~~~ php
+<?php
+// noteresource.inc
+/**
+ * Callback for retrieving note resources.
+ *
+ * @param int $id
+ * @return object
+ */
+function _noteresource_retrieve($id) {
+  return noteresource_get_note($id);
+}
 
-    /**
-     * Callback for deleting note resources.
-     *
-     * @param int $id
-     * @return object
-     */
-    function _noteresource_delete($id) {
-      noteresource_delete_note($id);
-      return (object)array(
-        'id' => $id,
-      );
-    }
+/**
+ * Callback for deleting note resources.
+ *
+ * @param int $id
+ * @return object
+ */
+function _noteresource_delete($id) {
+  noteresource_delete_note($id);
+  return (object)array(
+    'id' => $id,
+  );
+}
+~~~
 
 The index callback fetches a users notes and returns them all. We specified some arguments for this method that we don't use. They are mostly here to show that it would be a good idea to support paging and filtering of a index listing.
 
-    <?php
-    // noteresource.inc
-    /**
-     * Callback for listing notes.
-     *
-     * @param int $page
-     * @param array $parameters
-     * @return array
-     */
-    function _noteresource_index($page, $parameters) {
-      global $user;
+~~~ php
+<?php
+// noteresource.inc
+/**
+ * Callback for listing notes.
+ *
+ * @param int $page
+ * @param array $parameters
+ * @return array
+ */
+function _noteresource_index($page, $parameters) {
+  global $user;
 
-      $notes = array();
-      $res = db_query("SELECT * FROM {note} WHERE uid=%d ORDER BY modified DESC", array(
-        ':uid' => $user->uid,
-      ));
+  $notes = array();
+  $res = db_query("SELECT * FROM {note} WHERE uid=%d ORDER BY modified DESC", array(
+    ':uid' => $user->uid,
+  ));
 
-      while ($note = db_fetch_object($res)) {
-        $notes[] = $note;
-      }
+  while ($note = db_fetch_object($res)) {
+    $notes[] = $note;
+  }
 
-      return $notes;
-    }
+  return $notes;
+}
+~~~
 
 ### Access checking
 
 Last but not least, we specified a access callback for all methods. This checks so that users don't oversteps their bounds and starts looking at other people's notes without having the proper permissions. This function should be in the main .module file.
 
-    <?php
-    // noteresource.module
-    /**
-     * Access callback for the note resource.
-     *
-     * @param string $op
-     *  The operation that's going to be performed.
-     * @param array $args
-     *  The arguments that will be passed to the callback.
-     * @return bool
-     *  Whether access is given or not.
-     */
-    function _noteresource_access($op, $args) {
-      global $user;
-      $access = FALSE;
+~~~ php
+<?php
+// noteresource.module
+/**
+ * Access callback for the note resource.
+ *
+ * @param string $op
+ *  The operation that's going to be performed.
+ * @param array $args
+ *  The arguments that will be passed to the callback.
+ * @return bool
+ *  Whether access is given or not.
+ */
+function _noteresource_access($op, $args) {
+  global $user;
+  $access = FALSE;
 
-      switch ($op) {
-        case 'view':
-          $note = noteresource_get_note($args[0]);
-          $access = user_access('note resource view any note');
-          $access = $access || $note->uid == $user->uid && user_access('note resource view own notes');
-          break;
-        case 'update':
-          $note = noteresource_get_note($args[0]->id);"
-          $access = user_access('note resource edit any note');
-          $access = $access || $note->uid == $user->uid && user_access('note resource edit own notes');
-          break;
-        case 'delete':
-          $note = noteresource_get_note($args[0]);
-          $access = user_access('note resource delete any note');
-          $access = $access || $note->uid == $user->uid && user_access('note resource delete own notes');
-          break;
-      }
+  switch ($op) {
+    case 'view':
+      $note = noteresource_get_note($args[0]);
+      $access = user_access('note resource view any note');
+      $access = $access || $note->uid == $user->uid && user_access('note resource view own notes');
+      break;
+    case 'update':
+      $note = noteresource_get_note($args[0]->id);"
+      $access = user_access('note resource edit any note');
+      $access = $access || $note->uid == $user->uid && user_access('note resource edit own notes');
+      break;
+    case 'delete':
+      $note = noteresource_get_note($args[0]);
+      $access = user_access('note resource delete any note');
+      $access = $access || $note->uid == $user->uid && user_access('note resource delete own notes');
+      break;
+  }
 
-      return $access;
-    }
+  return $access;
+}
+~~~
 
 As you can see neither the create nor the index function is represented here. That's because they both use user_access() directly. Unlike the other methods there are no considerations like note ownership to take into account. For creation the permission 'note resource create' is checked and for the index listing only 'access content' is needed.
 
@@ -495,13 +515,15 @@ Writing a simple JavaScript client
 
 We'll put our javascript client in a module named noteresourcejs. The info file could look something like this:
 
-    ; $Id$
-    name = Notes Javascript
-    description = Sample endpoint definition and javascript client implementation
-    package = Notes example
+~~~
+; $Id$
+name = Notes Javascript
+description = Sample endpoint definition and javascript client implementation
+package = Notes example
 
-    core = 6.x
-    php = 5.2
+core = 6.x
+php = 5.2
+~~~
 
 The javascript module will do two things: implement a javascript client; and provide the notes endpoint in code.
 
@@ -509,47 +531,49 @@ The javascript module will do two things: implement a javascript client; and pro
 
 Goto admin/build/services and select Export for your Notes API endpoint. The code shown should be copy-pasted in a hook named hook_default_services_endpoint().
 
-    <?php
-    // noteresourcejs.module
-    /**
-     * Implementation of hook_default_services_endpoint().
-     */
-    function noteresourcejs_default_services_endpoint() {
-      $endpoints = array();
+~~~ php
+<?php
+// noteresourcejs.module
+/**
+ * Implementation of hook_default_services_endpoint().
+ */
+function noteresourcejs_default_services_endpoint() {
+  $endpoints = array();
 
-      $endpoint = new stdClass;
-      $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
-      $endpoint->name = 'notes_js';
-      $endpoint->title = 'Note API';
-      $endpoint->server = 'rest_server';
-      $endpoint->path = 'js-api';
-      $endpoint->authentication = array();
-      $endpoint->resources = array(
-        'note' => array(
-          'alias' => '',
-          'operations' => array(
-            'create' => array(
-              'enabled' => 1,
-            ),
-            'retrieve' => array(
-              'enabled' => 1,
-            ),
-            'update' => array(
-              'enabled' => 1,
-            ),
-            'delete' => array(
-              'enabled' => 1,
-            ),
-            'index' => array(
-              'enabled' => 1,
-            ),
-          ),
+  $endpoint = new stdClass;
+  $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
+  $endpoint->name = 'notes_js';
+  $endpoint->title = 'Note API';
+  $endpoint->server = 'rest_server';
+  $endpoint->path = 'js-api';
+  $endpoint->authentication = array();
+  $endpoint->resources = array(
+    'note' => array(
+      'alias' => '',
+      'operations' => array(
+        'create' => array(
+          'enabled' => 1,
         ),
-      );
-      $endpoints[] = $endpoint;
+        'retrieve' => array(
+          'enabled' => 1,
+        ),
+        'update' => array(
+          'enabled' => 1,
+        ),
+        'delete' => array(
+          'enabled' => 1,
+        ),
+        'index' => array(
+          'enabled' => 1,
+        ),
+      ),
+    ),
+  );
+  $endpoints[] = $endpoint;
 
-      return $endpoints;
-    }
+  return $endpoints;
+}
+~~~
 
 Notice that we don't return the endpoint as it is. But, as with views, we return an array containing the endpoint.
 
@@ -557,66 +581,70 @@ Notice that we don't return the endpoint as it is. But, as with views, we return
 
 Our client is quite trivial and will consist of one js file and one css file. I'm not going to write them both in their entirety here, but rather provide an excerpt that illustrates how you can communicate with a REST server using JavaScript. See [notes.js](services-3.x-sample/blob/master/js/notes.js) and [notes.css](services-3.x-sample/blob/master/css/notes.css) for the full versions.
 
-    // js/notes.js (excerpt)
-    var noteapi = {
-      'apiPath': '/js-api/note'
-    };
+~~~ js
+// js/notes.js (excerpt)
+var noteapi = {
+  'apiPath': '/js-api/note'
+};
 
-    // REST functions.
-    noteapi.create = function(note, callback) {
-      $.ajax({
-         type: "POST",
-         url: this.apiPath,
-         data: JSON.stringify(note),
-         dataType: 'json',
-         contentType: 'application/json',
-         success: callback
-       });
-    };
+// REST functions.
+noteapi.create = function(note, callback) {
+  $.ajax({
+     type: "POST",
+     url: this.apiPath,
+     data: JSON.stringify(note),
+     dataType: 'json',
+     contentType: 'application/json',
+     success: callback
+   });
+};
 
-    noteapi.retreive = function(id, callback) {
-      $.ajax({
-        type: "GET",
-        url: this.apiPath + '/' + id,
-        dataType: 'json',
-        success: callback
-      });
-    };
+noteapi.retreive = function(id, callback) {
+  $.ajax({
+    type: "GET",
+    url: this.apiPath + '/' + id,
+    dataType: 'json',
+    success: callback
+  });
+};
 
-    noteapi.update = function(note, callback) {
-      $.ajax({
-         type: "PUT",
-         url: this.apiPath + '/' + note.id,
-         data: JSON.stringify(note),
-         dataType: 'json',
-         contentType: 'application/json',
-         success: callback
-       });
-    };
+noteapi.update = function(note, callback) {
+  $.ajax({
+     type: "PUT",
+     url: this.apiPath + '/' + note.id,
+     data: JSON.stringify(note),
+     dataType: 'json',
+     contentType: 'application/json',
+     success: callback
+   });
+};
 
-    noteapi.del = function(id, callback) {
-      $.ajax({
-         type: "DELETE",
-         url: this.apiPath + '/' + id,
-         dataType: 'json',
-         success: callback
-       });
-    };
+noteapi.del = function(id, callback) {
+  $.ajax({
+     type: "DELETE",
+     url: this.apiPath + '/' + id,
+     dataType: 'json',
+     success: callback
+   });
+};
 
-    noteapi.index = function (callback) {
-      $.getJSON(this.apiPath, callback);
-    };
+noteapi.index = function (callback) {
+  $.getJSON(this.apiPath, callback);
+};
+~~~
 
 Notice how we don't need to do anything odd to talk with our server. Everything maps to http verbs and a url, so there is no need for special client libraries.
 
 The js and css is added in hook_init(), and will therefore be loaded on all pages in our Drupal install.
 
-    <?php
-    // noteresourcejs.module
-    /**
-     * Implementation of hook_init().
-     */
-    function noteresourcejs_init() {
-      drupal_add_css(drupal_get_path('module', 'noteresourcejs') . '/css/notes.css');
-      drupal_add_js(drupal_get_path('module', 'noteresourcejs') . '/js/notes.js');
-    }
+~~~ php
+<?php
+// noteresourcejs.module
+/**
+ * Implementation of hook_init().
+ */
+function noteresourcejs_init() {
+  drupal_add_css(drupal_get_path('module', 'noteresourcejs') . '/css/notes.css');
+  drupal_add_js(drupal_get_path('module', 'noteresourcejs') . '/js/notes.js');
+}
+~~~
