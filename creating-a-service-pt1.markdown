@@ -581,7 +581,7 @@ Notice that we don't return the endpoint as it is. But, as with views, we return
 
 Our client is quite trivial and will consist of one js file and one css file. I'm not going to write them both in their entirety here, but rather provide an excerpt that illustrates how you can communicate with a REST server using JavaScript. See [notes.js](services-3.x-sample/blob/master/js/notes.js) and [notes.css](services-3.x-sample/blob/master/css/notes.css) for the full versions.
 
-~~~ php
+~~~ js
 // js/notes.js (excerpt)
 var noteapi = {
   'apiPath': '/js-api/note'
