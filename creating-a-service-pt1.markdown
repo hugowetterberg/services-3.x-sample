@@ -482,7 +482,7 @@ function _noteresource_access($op, $args) {
       $access = $access || $note->uid == $user->uid && user_access('note resource view own notes');
       break;
     case 'update':
-      $note = noteresource_get_note($args[0]->id);"
+      $note = noteresource_get_note($args[0]->id);
       $access = user_access('note resource edit any note');
       $access = $access || $note->uid == $user->uid && user_access('note resource edit own notes');
       break;
